@@ -3,9 +3,9 @@ services:
     image: pgvector/pgvector:pg16
     container_name: face_db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: facedb
+      POSTGRES_USER: genius
+      POSTGRES_PASSWORD: tensai102do
+      POSTGRES_DB: tsukishima_face_db
     ports:
       - "5432:5432"
     volumes:
@@ -13,6 +13,11 @@ services:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - face_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d facedb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
   web:
@@ -26,7 +31,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:password@db:5432/facedb
+      - DATABASE_URL=postgresql://genius:tensai102do@db:5432/tsukishima_face_db
       - PYTHONUNBUFFERED=1
     depends_on:
       db:
