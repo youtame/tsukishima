@@ -1,0 +1,44 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: face_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: facedb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - face_network
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    container_name: face_web
+    volumes:
+      - ./app:/app
+      - deepface_models:/root/.deepface/weights
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/facedb
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - face_network
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  deepface_models:
+
+networks:
+  face_network:
+    driver: bridge
