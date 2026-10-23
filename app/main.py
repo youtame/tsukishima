@@ -53,7 +53,7 @@ async def search_face(file: UploadFile = File(..., description="The query image 
             SELECT user_code, name, (1 - (face_embedding <=> %s::vector)) AS similarity
             FROM users
             ORDER BY face_embedding <=> %s::vector ASC
-            LIMIT 4;
+            LIMIT 10;
         """, (target_embedding, target_embedding))
         
         results = cur.fetchall()

@@ -219,3 +219,6 @@ __marimo__/
 
 # Faces
 app/scripts/images/
+
+# Mac
+.DS_Store
